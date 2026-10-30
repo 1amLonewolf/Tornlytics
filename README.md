@@ -79,12 +79,41 @@ returns up to 100 log entries per request. A future API integration must map
 real log entries to financial categories carefully; the demo categorization is
 not a substitute for validating Torn's log types and their money amounts.
 
+### Source layout
+
+- `src/App.tsx` contains dashboard state and page composition.
+- `src/components/` contains reusable visual components, including the cash-flow chart and icons.
+- `src/data/demo-transactions.ts` owns the fictional sample records. They are normalized to the shared transaction model and carry timestamps rather than demo-only relative dates.
+- `src/domain/finance.ts` defines the normalized finance types, date-range filtering, category definitions, and total calculations.
+- `src/lib/formatters.ts` contains display formatting for money and dates.
+- `src/assets/` contains the fonts, licenses, and app-ready logo used by the interface.
+
+Keep API response types and mapping separate from the normalized `Transaction`
+model when integration begins. Validate API payloads and timestamps before
+mapping them, and only categorize log types whose money-flow meaning has been
+verified. Keep aggregation and filtering in the domain layer so they work the
+same for demo and API-backed transactions.
+
+### API key and deployment boundary
+
+The browser app currently has no API-key handling. Torn requires the key as a
+request parameter, so a request made directly from the browser exposes that key
+to the user and browser tooling. Before collecting keys, choose a deployment
+and credential-storage approach; do not put a real key in source code, a
+`VITE_*` environment variable, browser storage, or a committed config file.
+Never ask users to paste keys into chat. Any future request flow must also
+handle API errors and stay within Torn's documented rate limit.
+
 To run the dashboard locally:
 
 ```sh
 npm install
 npm run dev
 ```
+
+For a visual preview of the loading skeleton, open `/loading-preview` while
+the development server is running. This preview route is for design review;
+the loading state will be connected to real API requests during integration.
 
 Run `npm run build` to type-check and create the production bundle.
 If PowerShell blocks `npm.ps1` due to its execution policy, use `npm.cmd`
